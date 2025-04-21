@@ -213,3 +213,83 @@ begin
 end;
 /
 undefine numero;
+
+
+-- Mostrar la tabla de multiplicar de un numero que pidamos al usuario
+/ 
+declare
+    numero int;
+    mult int;
+    total int;
+begin
+    numero := &numero;
+    mult := 0;
+    loop
+    mult := mult + 1;
+    total := mult * numero;
+    dbms_output.put_line(numero || '*' || mult || '=' || total);
+    exit when mult = 10;
+    end loop;
+end;
+/
+
+-- Otra forma de hacerlo
+
+/
+declare 
+    numero int;
+    total int;
+begin
+    numero := &numero;
+    for i in 1..10 loop
+        total := numero * i;
+        dbms_output.put_line(numero || '*' || i || '=' || total);
+    end loop;
+end;
+/
+undefine numero;
+
+
+-- Quiero un programa que nos pedira un texto, debemos recorrer dicho texto letra a letra. Es decir, mostrar cada letra de forma individual.
+
+/
+declare
+    v_texto varchar2(50);
+    v_longitud int;
+    v_letra varchar2(1);
+begin
+    v_texto := '&texto';
+    -- Un elemento en oracle empieza en 1
+    -- En un lugar de la mancha...
+    v_longitud := LENGTH(v_texto);
+    for i in 1..v_longitud loop
+        v_letra := SUBSTR (v_texto,i,1);
+        dbms_output.put_line(v_letra);
+    end loop;
+end;
+/
+undefine texto;
+
+-- Necesito un programa donde introducir un texto numerico: 1234
+-- Necesito mostrar la suma de todos los caracteres numericos en un mensaje
+
+/
+declare
+    v_texto varchar2(50);
+    v_longitud int;
+    v_letra CHAR(1);
+    v_numero int;
+    v_suma int;
+begin
+    v_suma := 0;
+    v_texto := &texto;
+    v_longitud := LENGTH(v_texto);
+    for i in 1..v_longitud loop
+        v_letra := SUBSTR (v_texto,i,1);
+        v_numero := TO_NUMBER(v_letra);
+        v_suma := v_suma + v_numero;
+    end loop;
+    dbms_output.put_line(v_suma);
+end;
+/
+undefine texto;
