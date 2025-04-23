@@ -299,6 +299,109 @@ begin
         else 
             update emp set salario = salario - 10000 where salario = v_salario;
         end if;
+    dbms_output.put_line('Salario modificado ' || v_salario);
 end;
 /
 select * from emp;
+
+
+-- Realizar el siguiente codigo pl/sql
+-- Necesitamos incrementar el salario de los doctores de La Paz
+-- Si la suma salarial supera el 1.000.000 bajamos salarios en 10.000 a todos y si no supera, subimos salarios en 10.000
+-- Mostar el numero de filas que hemos modificado
+select * from doctor;
+select * from hospital;
+/
+declare
+    v_salario doctor.salario%type; 
+begin
+    select sum (salario) into v_salario from doctor where hospital_cod = 22;
+        If (v_salario <= 1000000) then
+            update doctor set salario = salario + 10000 where hospital_cod = 22;
+            dbms_output.put_line('Doctores con suerte ' || sql%rowcount);
+        else
+            update doctor set salario = salario - 10000 where hospital_cod = 22;
+            dbms_output.put_line('Doctores sin suerte ' || sql%rowcount);
+        end if;
+end;
+/
+
+/
+declare
+    v_salario number; 
+begin
+    SELECT sum (salario) into v_salario FROM doctor natural JOIN hospital where upper(nombre) = 'LA PAZ';
+    dbms_output.put_line ('suma salarial de la paz ' || v_salario);
+        If (v_salario <= 1000000) then
+            update doctor set salario = salario + 10000 where hospital_cod = (select hospital_cod from hospital where upper(nombre) = 'LA PAZ');
+            dbms_output.put_line('Doctores con suerte ' || sql%rowcount);
+        else
+            update doctor set salario = salario - 10000 where hospital_cod = (select hospital_cod from hospital where upper(nombre) = 'LA PAZ');
+            dbms_output.put_line('Doctores sin suerte ' || sql%rowcount);
+        end if;
+end;
+/
+
+/
+declare
+    v_hospital hospital.hospital_cod%type;
+    v_salario1 number; 
+begin
+    select hospital_cod into v_hospital from hospital where lower(nombre) = 'la paz';
+    select sum (salario) into v_salario1 FROM doctor where hospital_cod = v_hospital;
+            if (v_salario1 <= 1000000) then
+            update doctor set salario = salario + 10000 where hospital_cod = v_hospital;
+            dbms_output.put_line('Doctores con suerte ' || sql%rowcount);
+            else 
+            update doctor set salario = salario - 10000 where hospital_cod = v_hospital;
+            dbms_output.put_line('Doctores con suerte ' || sql%rowcount);
+            end if;
+end;
+/
+
+-- Quiero un bloque pl/sql que nos muestre los datos del doctor cajal
+select * from doctor;
+/
+declare
+    v_fila doctor%rowtype;
+    v_apellido doctor.apellido%type := 'Cajal R';
+begin
+    select * into v_fila from doctor where apellido = v_apellido;
+    dbms_output.put_line('hospital cod: ' || v_fila.hospital_cod);
+    dbms_output.put_line('numero doctor: ' || v_fila.doctor_no);
+    dbms_output.put_line('apellido: ' || v_fila.apellido);
+    dbms_output.put_line('especialidad: ' || v_fila.especialidad);
+    dbms_output.put_line('salario: ' || v_fila.salario);
+end;
+/
+
+-- Realizamos la declaracion con departamentos
+-- Podemos almacenar todos los departamentos (uno a uno) en un rowtype
+describe dept;
+/
+declare
+    v_fila dept%rowtype;
+    cursor cursor_dept is select * from dept;
+begin
+    open cursor_dept;
+        loop
+            fetch cursor_dept into v_fila;
+            exit when cursor_dept%notfound;
+            dbms_output.put_line('ID: ' || v_fila.dept_no || ', nombre: ' || v_fila.dnombre || ', localidad: ' || v_fila.loc);
+        end loop;
+    close cursor_dept;
+    
+end;
+/
+
+-- Realizar un cursor para mostrar el apellido, salario y oficio de los empleados 
+/
+declare 
+    cursor cursor_emp is select apellido, salario, oficio, salario + comision as total from emp;
+begin
+    for v_registro in cursor_emp 
+    loop
+    dbms_output.put_line('Apellido: ' || v_registro.apellido || ', Salario: ' || v_registro.salario || ', Oficio: ' || v_registro.oficio || ', Total:' || v_registro.total);
+    end loop;
+end;
+/
