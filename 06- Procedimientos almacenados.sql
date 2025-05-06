@@ -223,7 +223,7 @@ end;
 /
 /
 begin
-sp_empleados_dept (00);
+sp_empleados_dept (10);
 end;
 /
 
