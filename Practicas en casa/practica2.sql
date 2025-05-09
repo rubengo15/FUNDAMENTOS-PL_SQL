@@ -291,3 +291,81 @@ BEGIN
 END;
 /
 
+-- 16.	Crear un procedimiento almacenado que devuelva un ROWTYPE de género pasando como parámetro de entrada el idGenero.
+/
+CREATE TABLE GENEROS1 (
+  IDGENERO NUMBER(11,0) NOT NULL,
+  GENERO VARCHAR2(50)
+);
+/
+CREATE OR REPLACE PROCEDURE obtener_genero_rowtype (
+  p_idgenero IN GENEROS1.IDGENERO%TYPE,
+  p_genero OUT GENEROS1%ROWTYPE
+) AS
+BEGIN
+  SELECT *
+  INTO p_genero
+  FROM GENEROS1
+  WHERE IDGENERO = p_idgenero;
+  
+  DBMS_OUTPUT.PUT_LINE('IDGENERO: ' || p_genero.IDGENERO || ' - GENERO: ' || p_genero.GENERO);
+END obtener_genero_rowtype;
+/
+DECLARE
+  v_genero GENEROS1%ROWTYPE;
+BEGIN
+  obtener_genero_rowtype(1, v_genero);
+  
+  -- También puedes mostrarlo aquí
+  DBMS_OUTPUT.PUT_LINE('Desde el bloque: IDGENERO=' || v_genero.IDGENERO || ', GENERO=' || v_genero.GENERO);
+END;
+/
+
+/* 17.	Usar una sentencia case dentro de un procedimiento almacenado para que nos devuelva de la tabla distribuidoras:
+
+- SP si el nombre es SONY PICTURES.
+- BVI si es BUENA VISTA INTERNACIONAL
+- LF si es  LAUREN FILMS.                                       
+- WB si es WARNER BROTHERS.
+-TP si es TRIPICTURES.
+
+El procedimiento almacenado tendrá un parámetro de entrada (IdDistribuidor) y nos devolverá el nombre del distribuidor.
+*/
+/
+CREATE OR REPLACE PROCEDURE obtener_codigo_distribuidor (
+  p_iddistribuidor IN DISTRIBUIDORAS.IDDISTRIBUIDOR%TYPE,
+  p_codigo OUT VARCHAR2
+) AS
+  v_nombre DISTRIBUIDORAS.DISTRIBUIDOR%TYPE;
+BEGIN
+  -- Obtener el nombre del distribuidor
+  SELECT DISTRIBUIDOR
+  INTO v_nombre
+  FROM DISTRIBUIDORAS
+  WHERE IDDISTRIBUIDOR = p_iddistribuidor;
+  
+  -- Asignar el código según el nombre usando CASE
+  p_codigo := CASE UPPER(v_nombre)
+                WHEN 'SONY PICTURES' THEN 'SP'
+                WHEN 'BUENA VISTA INTERNACIONAL' THEN 'BVI'
+                WHEN 'LAUREN FILMS' THEN 'LF'
+                WHEN 'WARNER BROTHERS' THEN 'WB'
+                WHEN 'TRIPICTURES' THEN 'TP'
+                ELSE 'DESCONOCIDO'
+              END;
+              
+  DBMS_OUTPUT.PUT_LINE('El código para el distribuidor "' || v_nombre || '" es: ' || p_codigo);
+  
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('No se encontró distribuidor con ID: ' || p_iddistribuidor);
+    p_codigo := NULL;
+END obtener_codigo_distribuidor;
+/
+DECLARE
+  v_codigo VARCHAR2(10);
+BEGIN
+  obtener_codigo_distribuidor(1, v_codigo);
+  DBMS_OUTPUT.PUT_LINE('Código devuelto: ' || v_codigo);
+END;
+/
